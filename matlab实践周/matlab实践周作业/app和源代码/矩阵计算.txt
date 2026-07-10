@@ -1,0 +1,330 @@
+classdef MatrixCalculator < matlab.apps.AppBase
+
+    % Properties that correspond to app components
+    properties (Access = public)
+        UIFigure         matlab.ui.Figure
+        Panel            matlab.ui.container.Panel
+        BtnAdd           matlab.ui.control.Button
+        BtnSub           matlab.ui.control.Button
+        BtnMul           matlab.ui.control.Button
+        BtnDotMul        matlab.ui.control.Button
+        BtnTrans         matlab.ui.control.Button
+        BtnAnalysis      matlab.ui.control.Button
+        BtnSolveEq       matlab.ui.control.Button
+        BtnClear         matlab.ui.control.Button
+        Panel_2          matlab.ui.container.Panel
+        LabelB           matlab.ui.control.Label
+        LabelA           matlab.ui.control.Label
+        BEditFieldLabel  matlab.ui.control.Label
+        BEditField       matlab.ui.control.EditField
+        AEditFieldLabel  matlab.ui.control.Label
+        AEditField       matlab.ui.control.EditField
+        Panel_3          matlab.ui.container.Panel
+        Label_3          matlab.ui.control.Label
+        ResultTextArea   matlab.ui.control.EditField
+    end
+
+methods (Access = private)
+function mat = parseInput(app, editComp)
+    s = editComp.Value;
+    if isempty(s)
+        error('输入不能为空，请按MATLAB格式输入，例 [1 2;3 4]');
+    end
+    mat = str2num(s);
+    if isempty(mat)
+        error('矩阵格式非法，需用 [] 包裹，分号换行、空格分隔元素');
+    end
+end
+end
+
+    methods (Access = private)
+
+        % Button pushed function: BtnAdd
+        function BtnAddButtonPushed(app, event)
+        try
+        % 解析输入
+        A = app.parseInput(app.AEditField);
+        B = app.parseInput(app.BEditField);
+        % 维度校验
+        if ~isequal(size(A),size(B))
+            error('加法要求A、B行列维度必须完全一致');
+        end
+        C = A + B;
+        % 成功：淡绿色背景
+        app.ResultTextArea.BackgroundColor = [0.8, 1, 0.8];
+        app.ResultTextArea.Value = ['A+B = ' mat2str(C,4)];
+    catch err
+        % 失败：淡红色背景
+        app.ResultTextArea.BackgroundColor = [1, 0.8, 0.8];
+        app.ResultTextArea.Value = ['运算失败：' err.message];
+    end
+        
+        end
+
+        % Button pushed function: BtnSub
+        function BtnSubButtonPushed(app, event)
+        try
+        A = app.parseInput(app.AEditField);
+        B = app.parseInput(app.BEditField);
+        if ~isequal(size(A),size(B))
+            error('减法要求A、B行列维度必须完全一致');
+        end
+        C = A - B;
+        app.ResultTextArea.BackgroundColor = [0.8, 1, 0.8];
+        app.ResultTextArea.Value = ['A-B = ' mat2str(C,4)];
+    catch err
+        app.ResultTextArea.BackgroundColor = [1, 0.8, 0.8];
+        app.ResultTextArea.Value = ['运算失败：' err.message];
+    end
+       
+        end
+
+        % Button pushed function: BtnMul
+        function BtnMulButtonPushed(app, event)
+       try
+        A = app.parseInput(app.AEditField);
+        B = app.parseInput(app.BEditField);
+        if size(A,2) ~= size(B,1)
+            error('矩阵乘法要求：A的列数必须等于B的行数');
+        end
+        C = A * B;
+        app.ResultTextArea.BackgroundColor = [0.8, 1, 0.8];
+        app.ResultTextArea.Value = ['A*B = ' mat2str(C,4)];
+    catch err
+        app.ResultTextArea.BackgroundColor = [1, 0.8, 0.8];
+        app.ResultTextArea.Value = ['运算失败：' err.message];
+    end
+        
+        end
+
+        % Button pushed function: BtnDotMul
+        function BtnDotMulButtonPushed(app, event)
+       try
+        A = app.parseInput(app.AEditField);
+        B = app.parseInput(app.BEditField);
+        if ~isequal(size(A),size(B))
+            error('点乘要求A、B行列维度必须完全一致');
+        end
+        C = A .* B;
+        app.ResultTextArea.BackgroundColor = [0.8, 1, 0.8];
+        app.ResultTextArea.Value = ['A.*B = ' mat2str(C,4)];
+    catch err
+        app.ResultTextArea.BackgroundColor = [1, 0.8, 0.8];
+        app.ResultTextArea.Value = ['运算失败：' err.message];
+       end
+        end
+
+        % Button pushed function: BtnTrans
+        function BtnTransButtonPushed(app, event)
+        
+    try
+        A = app.parseInput(app.AEditField);
+        AT = A';
+        app.ResultTextArea.BackgroundColor = [0.8, 1, 0.8];
+        app.ResultTextArea.Value = ['A转置 = ' mat2str(AT,4)];
+    catch err
+        app.ResultTextArea.BackgroundColor = [1, 0.8, 0.8];
+        app.ResultTextArea.Value = ['运算失败：' err.message];
+    end
+        
+        end
+
+        % Button pushed function: BtnAnalysis
+        function BtnAnalysisButtonPushed(app, event)
+       try
+        A = app.parseInput(app.AEditField);
+        [r,c] = size(A);
+        rk = rank(A);
+        outStr = sprintf('矩阵维度：%d×%d，矩阵秩 = %d',r,c,rk);
+        if r == c
+            d = det(A);
+            outStr = [outStr sprintf('，行列式 = %.4f',d)];
+            if abs(d) > 1e-6
+                invA = inv(A);
+                outStr = [outStr '，矩阵可逆，逆矩阵 = ' mat2str(invA,4)];
+            else
+                outStr = [outStr '，矩阵奇异，不可逆'];
+            end
+        else
+            outStr = [outStr '，非方阵，无法计算行列式与逆矩阵'];
+        end
+        app.ResultTextArea.BackgroundColor = [0.8, 1, 0.8];
+        app.ResultTextArea.Value = outStr;
+    catch err
+        app.ResultTextArea.BackgroundColor = [1, 0.8, 0.8];
+        app.ResultTextArea.Value = ['运算失败：' err.message];
+       end
+        end
+
+        % Button pushed function: BtnSolveEq
+        function BtnSolveEqButtonPushed(app, event)
+        try
+        A = app.parseInput(app.AEditField);
+        B = app.parseInput(app.BEditField);
+        if size(A,1) ~= size(B,1)
+            error('方程组Ax=B要求：A的行数必须等于B的行数');
+        end
+        x = A \ B;
+        res = norm(A*x - B);
+        outStr = sprintf('方程组解 x = %s\n残差 = %.6e',mat2str(x,4),res);
+        app.ResultTextArea.BackgroundColor = [0.8, 1, 0.8];
+        app.ResultTextArea.Value = outStr;
+    catch err
+        app.ResultTextArea.BackgroundColor = [1, 0.8, 0.8];
+        app.ResultTextArea.Value = ['运算失败：' err.message];
+        end
+        end
+
+        % Button pushed function: BtnClear
+        function BtnClearPushed(app, event)
+            % 清空两个输入框
+    app.AEditField.Value = '';
+    app.BEditField.Value = '';
+    % 清空结果框 + 恢复默认白色背景
+    app.ResultTextArea.Value = '';
+    app.ResultTextArea.BackgroundColor = [1, 1, 1];
+
+        end
+    end
+
+    % App initialization and construction
+    methods (Access = private)
+
+        % Create UIFigure and components
+        function createComponents(app)
+
+            % Create UIFigure
+            app.UIFigure = uifigure;
+            app.UIFigure.Position = [100 100 475 493];
+            app.UIFigure.Name = 'UI Figure';
+
+            % Create Panel
+            app.Panel = uipanel(app.UIFigure);
+            app.Panel.Title = '运算按钮';
+            app.Panel.Position = [67 136 369 216];
+
+            % Create BtnAdd
+            app.BtnAdd = uibutton(app.Panel, 'push');
+            app.BtnAdd.ButtonPushedFcn = createCallbackFcn(app, @BtnAddButtonPushed, true);
+            app.BtnAdd.Position = [31 168 100 22];
+            app.BtnAdd.Text = 'A+B';
+
+            % Create BtnSub
+            app.BtnSub = uibutton(app.Panel, 'push');
+            app.BtnSub.ButtonPushedFcn = createCallbackFcn(app, @BtnSubButtonPushed, true);
+            app.BtnSub.Position = [168 168 100 22];
+            app.BtnSub.Text = 'A-B';
+
+            % Create BtnMul
+            app.BtnMul = uibutton(app.Panel, 'push');
+            app.BtnMul.ButtonPushedFcn = createCallbackFcn(app, @BtnMulButtonPushed, true);
+            app.BtnMul.Position = [31 127 100 22];
+            app.BtnMul.Text = 'A*B';
+
+            % Create BtnDotMul
+            app.BtnDotMul = uibutton(app.Panel, 'push');
+            app.BtnDotMul.ButtonPushedFcn = createCallbackFcn(app, @BtnDotMulButtonPushed, true);
+            app.BtnDotMul.Position = [168 127 100 22];
+            app.BtnDotMul.Text = 'A.*B';
+
+            % Create BtnTrans
+            app.BtnTrans = uibutton(app.Panel, 'push');
+            app.BtnTrans.ButtonPushedFcn = createCallbackFcn(app, @BtnTransButtonPushed, true);
+            app.BtnTrans.Position = [31 87 100 24];
+            app.BtnTrans.Text = '转置';
+
+            % Create BtnAnalysis
+            app.BtnAnalysis = uibutton(app.Panel, 'push');
+            app.BtnAnalysis.ButtonPushedFcn = createCallbackFcn(app, @BtnAnalysisButtonPushed, true);
+            app.BtnAnalysis.Position = [168 87 100 24];
+            app.BtnAnalysis.Text = '分析';
+
+            % Create BtnSolveEq
+            app.BtnSolveEq = uibutton(app.Panel, 'push');
+            app.BtnSolveEq.ButtonPushedFcn = createCallbackFcn(app, @BtnSolveEqButtonPushed, true);
+            app.BtnSolveEq.Position = [31 17 227 56];
+            app.BtnSolveEq.Text = '求解Ax=B';
+
+            % Create BtnClear
+            app.BtnClear = uibutton(app.Panel, 'push');
+            app.BtnClear.ButtonPushedFcn = createCallbackFcn(app, @BtnClearPushed, true);
+            app.BtnClear.Position = [266 17 100 56];
+            app.BtnClear.Text = '清除重置';
+
+            % Create Panel_2
+            app.Panel_2 = uipanel(app.UIFigure);
+            app.Panel_2.Title = '矩阵计算器';
+            app.Panel_2.Position = [77 367 323 117];
+
+            % Create LabelB
+            app.LabelB = uilabel(app.Panel_2);
+            app.LabelB.Position = [215 21 108 72];
+            app.LabelB.Text = '矩阵输入';
+
+            % Create LabelA
+            app.LabelA = uilabel(app.Panel_2);
+            app.LabelA.Position = [25 21 106 72];
+            app.LabelA.Text = '矩阵输入';
+
+            % Create BEditFieldLabel
+            app.BEditFieldLabel = uilabel(app.Panel_2);
+            app.BEditFieldLabel.HorizontalAlignment = 'right';
+            app.BEditFieldLabel.Position = [171 21 25 22];
+            app.BEditFieldLabel.Text = 'B';
+
+            % Create BEditField
+            app.BEditField = uieditfield(app.Panel_2, 'text');
+            app.BEditField.Position = [211 21 100 22];
+
+            % Create AEditFieldLabel
+            app.AEditFieldLabel = uilabel(app.Panel_2);
+            app.AEditFieldLabel.HorizontalAlignment = 'right';
+            app.AEditFieldLabel.Position = [1 21 25 22];
+            app.AEditFieldLabel.Text = 'A';
+
+            % Create AEditField
+            app.AEditField = uieditfield(app.Panel_2, 'text');
+            app.AEditField.Position = [41 21 100 22];
+
+            % Create Panel_3
+            app.Panel_3 = uipanel(app.UIFigure);
+            app.Panel_3.Title = '结果';
+            app.Panel_3.Position = [44 17 389 108];
+
+            % Create Label_3
+            app.Label_3 = uilabel(app.Panel_3);
+            app.Label_3.HorizontalAlignment = 'right';
+            app.Label_3.Position = [19 44 53 22];
+            app.Label_3.Text = '运算结果';
+
+            % Create ResultTextArea
+            app.ResultTextArea = uieditfield(app.Panel_3, 'text');
+            app.ResultTextArea.Editable = 'off';
+            app.ResultTextArea.Position = [87 26 284 40];
+        end
+    end
+
+    methods (Access = public)
+
+        % Construct app
+        function app = MatrixCalculator
+
+            % Create and configure components
+            createComponents(app)
+
+            % Register the app with App Designer
+            registerApp(app, app.UIFigure)
+
+            if nargout == 0
+                clear app
+            end
+        end
+
+        % Code that executes before app deletion
+        function delete(app)
+
+            % Delete UIFigure when app is deleted
+            delete(app.UIFigure)
+        end
+    end
+end

@@ -1,0 +1,42 @@
+% 初等函数画册作业
+% 姓名：夏学长  学号：EIE240XX
+
+%% 1. 左上角 p=1：二次函数 y = x^2，红色虚线 r--
+subplot(2,2,1)
+x1 = linspace(-5,5,100);
+y1 = x1.^2;
+plot(x1,y1,'r--','LineWidth',1.2);
+title('y = x^2');
+grid on;
+xlabel('x');ylabel('y');
+
+%% 2. 右上角 p=2：指数函数 y = exp(x)，蓝色实线 b-
+subplot(2,2,2)
+x2 = linspace(-2,2,100);
+y2 = exp(x2);
+plot(x2,y2,'b-','LineWidth',1.2);
+title('y = e^x');
+grid on;
+xlabel('x');ylabel('y');
+
+%% 3. 左下角 p=3：自然对数函数 y = ln(x)，黑色实线 k-
+% 定义域x>0，起点不能取0，设置0.01开始
+subplot(2,2,3)
+x3 = linspace(0.01,5,100);
+y3 = log(x3);
+plot(x3,y3,'k-','LineWidth',1.2);
+title('y = ln(x)');
+grid on;
+xlabel('x');ylabel('y');
+
+%% 4. 右下角 p=4：正弦函数 y = sin(x)，绿色点划线 g-.
+subplot(2,2,4)
+x4 = linspace(-2*pi,2*pi,100);
+y4 = sin(x4);
+plot(x4,y4,'g-.','LineWidth',1.2);
+title('y = sin(x)');
+grid on;
+xlabel('x');ylabel('y');
+
+% 总标题（姓名+学号）
+sgtitle('初等函数画册 - 夏学长 (EIE240XX)','FontSize',13);

@@ -1,0 +1,277 @@
+classdef DigitalClockRecog < matlab.apps.AppBase
+
+    % Properties that correspond to app components
+    properties (Access = public)
+        UIFigure     matlab.ui.Figure
+        AxesOrigin   matlab.ui.control.UIAxes
+        AxesProcess  matlab.ui.control.UIAxes
+        BtnLoadImg   matlab.ui.control.Button
+        LabelResult  matlab.ui.control.Label
+        BtnRecog     matlab.ui.control.Button
+    end
+
+methods (Access = private)
+
+        function bwImg = PreProcess(app, img)
+            R = img(:, :, 1);
+            G = img(:, :, 2);
+            B = img(:, :, 3);
+            bwImg = (R > 140) & (R - G > 45) & (R - B > 45);
+            se = strel('rectangle', [5, 5]);
+            bwImg = imclose(bwImg, se);
+            bwImg = bwareaopen(bwImg, 200);
+        end
+
+        function result = SegmentRecog(app, bwImg)
+            proj = sum(bwImg, 1);
+            idx = proj > 3;
+            diff_idx = diff([0, idx, 0]);
+            col_start = find(diff_idx == 1);
+            col_end = find(diff_idx == -1) - 1;
+
+            if isempty(col_start)
+                result = '(no digits found)';
+                return;
+            end
+
+            bboxArr = [];
+            for k = 1:length(col_start)
+                c1 = col_start(k);
+                c2 = col_end(k);
+                col_slice = bwImg(:, c1:c2);
+                row_proj = sum(col_slice, 2);
+                r_idx = row_proj > 3;
+                r1 = find(r_idx, 1, 'first');
+                r2 = find(r_idx, 1, 'last');
+                if ~isempty(r1) && ~isempty(r2)
+                    bbox = [c1, r1, c2-c1, r2-r1];
+                    bboxArr = [bboxArr; bbox];
+                end
+            end
+
+            if isempty(bboxArr)
+                result = '(no regions)';
+                return;
+            end
+
+            [~, si] = sort(bboxArr(:, 1));
+            bboxArr = bboxArr(si, :);
+
+            % 7-segment patterns [a, f, b, g, e, c, d]
+            segStd = [
+                1 1 1 0 1 1 1;  % 0
+                0 0 1 0 0 1 0;  % 1
+                1 0 1 1 1 0 1;  % 2
+                1 0 1 1 0 1 1;  % 3
+                0 1 1 1 0 1 0;  % 4
+                1 1 0 1 0 1 1;  % 5
+                1 1 0 1 1 1 1;  % 6
+                1 0 1 0 0 1 0;  % 7
+                1 1 1 1 1 1 1;  % 8
+                1 1 1 1 0 1 1;  % 9
+            ];
+
+            numStr = '';
+            for i = 1:size(bboxArr, 1)
+                b = bboxArr(i, :);
+                c1 = b(1); r1 = b(2); w = b(3); h = b(4);
+
+                % skip colon
+                if h < 20
+                    if isempty(numStr) || numStr(end) ~= ':'
+                        numStr = [numStr, ':'];
+                    end
+                    continue;
+                end
+
+                % narrow region -> 1
+                if w > 0 && h > 0 && w / h < 0.4
+                    numStr = [numStr, '1'];
+                    continue;
+                end
+
+                x = max(1, round(c1));
+                y = max(1, round(r1));
+                w2 = min(size(bwImg, 2) - x, round(w));
+                h2 = min(size(bwImg, 1) - y, round(h));
+                if w2 < 3 || h2 < 3
+                    continue;
+                end
+                digitImg = bwImg(y:y+h2, x:x+w2);
+
+                segCode = app.extract_7seg_features(digitImg);
+
+                found = false;
+                for n = 1:10
+                    if isequal(segCode, segStd(n, :))
+                        numStr = [numStr, num2str(n-1)];
+                        found = true;
+                        break;
+                    end
+                end
+                if ~found
+                    numStr = [numStr, '?'];
+                end
+            end
+
+            if length(numStr) >= 6
+                result = sprintf('%s:%s %s', numStr(1:2), numStr(3:4), numStr(5:6));
+            else
+                result = numStr;
+            end
+        end
+
+        function code = extract_7seg_features(app, digitImg)
+            [H, W] = size(digitImg);
+
+            cMid = max(1, round(W*0.35)) : min(W, round(W*0.65));
+
+            % a - top horizontal
+            rTop = digitImg(1 : max(1, round(H*0.2)), cMid);
+            % g - middle horizontal
+            rMid = digitImg(max(1, round(H*0.45)) : min(H, round(H*0.55)), cMid);
+            % d - bottom horizontal
+            rBot = digitImg(min(H, round(H*0.8)) : H, cMid);
+
+            rT = max(1, round(H*0.2)) : min(H, round(H*0.45));
+            rB = max(1, round(H*0.55)) : min(H, round(H*0.8));
+            cL = 1 : max(1, round(W*0.4));
+            cR = min(W, round(W*0.6)) : W;
+
+            % f - top-left vertical
+            tl = digitImg(rT, cL);
+            % b - top-right vertical
+            tr = digitImg(rT, cR);
+            % e - bottom-left vertical
+            bl = digitImg(rB, cL);
+            % c - bottom-right vertical
+            br = digitImg(rB, cR);
+
+            means = [mean(rTop(:)), mean(tl(:)), mean(tr(:)), ...
+                     mean(rMid(:)), mean(bl(:)), mean(br(:)), mean(rBot(:))];
+
+            code = means > 0.3;
+        end
+end
+
+    methods (Access = private)
+
+        % Button pushed function: BtnLoadImg
+        function BtnLoadImgButtonPushed(app, event)
+try
+        [file, path] = uigetfile({'*.jpg;*.png;*.jpeg','图像文件'});
+        if isequal(file, 0)
+            return;
+        end
+        img = imread(fullfile(path, file));
+        % 第一个坐标轴显示原图
+        imshow(img, 'Parent', app.AxesOrigin);
+        title(app.AxesOrigin, '原始数码管时钟图像');
+        % 存入坐标轴缓存，无需新增全局属性
+        app.AxesOrigin.UserData = img;
+        app.LabelResult.Text = '识别结果...';
+    catch err
+        app.LabelResult.Text = sprintf('图片导入失败：%s', err.message);
+end
+        end
+
+        % Button pushed function: BtnRecog
+        function BtnRecogButtonPushed(app, event)
+try
+        img = app.AxesOrigin.UserData;
+        if isempty(img)
+            error('请先导入照片！');
+        end
+        % 调用预处理函数
+        bw = app.PreProcess(img);
+        % 第二个坐标轴展示形态学处理中间图
+        imshow(bw, 'Parent', app.AxesProcess);
+        title(app.AxesProcess, '形态学分割处理图');
+        % 调用识别函数
+        resTime = app.SegmentRecog(bw);
+        app.LabelResult.Text = sprintf('识别结果：%s', resTime);
+    catch err
+        app.LabelResult.Text = sprintf('识别失败：%s', err.message);
+end
+
+   
+        end
+    end
+
+    % App initialization and construction
+    methods (Access = private)
+
+        % Create UIFigure and components
+        function createComponents(app)
+
+            % Create UIFigure
+            app.UIFigure = uifigure;
+            app.UIFigure.Position = [100 100 640 480];
+            app.UIFigure.Name = 'UI Figure';
+
+            % Create AxesOrigin
+            app.AxesOrigin = uiaxes(app.UIFigure);
+            title(app.AxesOrigin, 'Title')
+            xlabel(app.AxesOrigin, 'X')
+            ylabel(app.AxesOrigin, 'Y')
+            app.AxesOrigin.TitleFontWeight = 'bold';
+            app.AxesOrigin.Position = [29 259 239 185];
+
+            % Create AxesProcess
+            app.AxesProcess = uiaxes(app.UIFigure);
+            title(app.AxesProcess, 'Title')
+            xlabel(app.AxesProcess, 'X')
+            ylabel(app.AxesProcess, 'Y')
+            app.AxesProcess.TitleFontWeight = 'bold';
+            app.AxesProcess.Position = [267 267 274 177];
+
+            % Create BtnLoadImg
+            app.BtnLoadImg = uibutton(app.UIFigure, 'push');
+            app.BtnLoadImg.ButtonPushedFcn = createCallbackFcn(app, @BtnLoadImgButtonPushed, true);
+            app.BtnLoadImg.FontSize = 20;
+            app.BtnLoadImg.Position = [114 153 127 99];
+            app.BtnLoadImg.Text = {'导入照片'; ''};
+
+            % Create LabelResult
+            app.LabelResult = uilabel(app.UIFigure);
+            app.LabelResult.HorizontalAlignment = 'center';
+            app.LabelResult.FontSize = 24;
+            app.LabelResult.FontWeight = 'bold';
+            app.LabelResult.Position = [98 31 392 103];
+            app.LabelResult.Text = '结果';
+
+            % Create BtnRecog
+            app.BtnRecog = uibutton(app.UIFigure, 'push');
+            app.BtnRecog.ButtonPushedFcn = createCallbackFcn(app, @BtnRecogButtonPushed, true);
+            app.BtnRecog.FontSize = 20;
+            app.BtnRecog.FontWeight = 'bold';
+            app.BtnRecog.FontColor = [1 0 0];
+            app.BtnRecog.Position = [342 153 123 99];
+            app.BtnRecog.Text = '开始识别';
+        end
+    end
+
+    methods (Access = public)
+
+        % Construct app
+        function app = DigitalClockRecog
+
+            % Create and configure components
+            createComponents(app)
+
+            % Register the app with App Designer
+            registerApp(app, app.UIFigure)
+
+            if nargout == 0
+                clear app
+            end
+        end
+
+        % Code that executes before app deletion
+        function delete(app)
+
+            % Delete UIFigure when app is deleted
+            delete(app.UIFigure)
+        end
+    end
+end
