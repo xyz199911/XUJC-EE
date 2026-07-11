@@ -6,7 +6,7 @@
 
  | 文件夹 | 说明 |
  |--------|------|
- | lession2/lession1/ | STM32实践工程（含Core驱动库、HAL库、MDK-ARM项目文件） |
+ | lession2/lession1/ | STM32温控系统（oled显示温度学号姓名 串口通信控制oled pwm控制风扇转速 蜂鸣器警报 蓝牙WiFi等） |
 
  ## 📌 重点看这里
 

@@ -62,8 +62,8 @@ typedef enum {
 #define CHAR_JI    11  // "级"
 #define CHAR_ZHUAN 12  // "专"
 #define CHAR_YE    13  // "业"
-#define CHAR_ZHEN 14  // "郑"
-#define CHAR_LI    15  // "理"
+#define CHAR_1 14  // "填你的名字"
+#define CHAR_2   15  // "你的名字"记得看oledfont.h
 #define CHAR_DIAN  16  // "电"
 #define CHAR_ZI    17  // "子"
 #define CHAR_FENG   20  // 风
@@ -135,8 +135,8 @@ void ShowBootScreen(void)
 	OLED_Display_Char_16X16(2, 0, CHAR_XING);
     OLED_Display_Char_16X16(2, 16, CHAR_MING);
     OLED_Display_String_8X16(2, 32, (uint8_t*)":");
-    OLED_Display_Char_16X16(2, 40, CHAR_ZHEN);
-    OLED_Display_Char_16X16(2, 56, CHAR_LI);
+    OLED_Display_Char_16X16(2, 40, CHAR_1);
+    OLED_Display_Char_16X16(2, 56, CHAR_2);
 	 OLED_Display_Char_16X16(4, 0, CHAR_ZHUAN);
     OLED_Display_Char_16X16(4, 16, CHAR_YE);
     OLED_Display_String_8X16(4, 32, (uint8_t*)":");
