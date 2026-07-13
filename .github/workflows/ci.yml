@@ -1,0 +1,34 @@
+ name: CI
+
+ on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+ jobs:
+  check-markdown:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check Markdown links
+        uses: gaurav-nelson/github-action-markdown-link-check@v1
+        with:
+          use-quiet-mode: yes
+          config-file: .github/mlc-config.json
+          max-depth: 1
+
+  check-gitignore:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify no bat files committed
+        run: |
+          if git ls-files '*.bat' | grep -q .; then
+            echo "Error: .bat files found in tracked files:"
+            git ls-files '*.bat'
+            exit 1
+          fi
+          echo "No .bat files tracked - OK"

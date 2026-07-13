@@ -1,0 +1,23 @@
+ {
+  "_comment": "Markdown link check config for gaurav-nelson/github-action-markdown-link-check",
+  "ignorePatterns": [
+    {
+      "pattern": "^https?://localhost"
+    },
+    {
+      "pattern": "\\.docx?$"
+    },
+    {
+      "pattern": "\\.pdf$"
+    },
+    {
+      "pattern": "\\.zip$"
+    }
+  ],
+  "replacementPatterns": [
+    {
+      "pattern": "^\\./",
+      "replacement": "https://github.com/xyz199911/XUJC-EE/blob/master/"
+    }
+  ]
+}

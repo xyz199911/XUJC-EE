@@ -1,8 +1,13 @@
 # Windows
 Thumbs.db
+*.bat
+*.cmd
 # Office
 ~
 *.tmp
+~$*.docx
+~$*.xlsx
+~$*.pptx
 # Python
 __pycache__/
 *.pyc
@@ -12,3 +17,12 @@ env/
 .idea/
 .vscode/
 *.suo
+*.swp
+*.swo
+# Personal workflow scripts
+branch.txt
+cmd.txt
+
+# Large PDFs (exceeds GitHub 100MB limit)
+信号与系统/考试内容（重点看）/
+信号与系统/教材/信号与系统.pdf
