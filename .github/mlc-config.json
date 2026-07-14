@@ -5,6 +5,9 @@
       "pattern": "^https?://localhost"
     },
     {
+      "pattern": "^https?://github.com"
+    },
+    {
       "pattern": "\\.docx?$"
     },
     {
@@ -14,10 +17,4 @@
       "pattern": "\\.zip$"
     }
   ],
-  "replacementPatterns": [
-    {
-      "pattern": "^\\./",
-      "replacement": "https://github.com/xyz199911/XUJC-EE/blob/master/"
-    }
-  ]
 }

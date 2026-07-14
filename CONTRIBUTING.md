@@ -19,28 +19,28 @@
  5. Commit 时遵循常规格式：`feat: add xxx course materials`
  6. 发起 Pull Request
 
- ## Commit 规范
+## Commit 规范
 
- 为了让历史整洁可读，建议按以下标签组织 commit 信息：
+为了让历史整洁可读，建议按以下标签组织 commit 信息：
 
- | 标签 | 用途 |
- |------|------|
- | `feat` | 新增课程或资料 |
- | `fix` | 修正错误链接或文件 |
- | `docs` | 更新文档/README |
- | `chore` | 配置、CI、工具链相关 |
- | `refactor` | 重组目录结构 |
+| 标签 | 用途 |
+|------|------|
+| `feat` | 新增课程或资料 |
+| `fix` | 修正错误链接或文件 |
+| `docs` | 更新文档/README |
+| `chore` | 配置、CI、工具链相关 |
+| `refactor` | 重组目录结构 |
 
- 示例：
- - `feat: add 数字逻辑电路复习笔记`
- - `fix: correct broken link in 信号与系统 README`
- - `docs: update 人工智能 README with exam strategy`
- - `chore: add GitHub Actions markdown lint`
+示例：
+- `feat: add 数字逻辑电路复习笔记`
+- `fix: correct broken link in 信号与系统 README`
+- `docs: update 人工智能 README with exam strategy`
+- `chore: add GitHub Actions markdown lint`
 
- ## 提问与建议
+## 提问与建议
 
- 开 Issue 就好，我看到会回复。
+开 Issue 就好，我看到会回复。
 
- ## License
+## License
 
- 贡献的资料同样遵循 MIT License。
+贡献的资料同样遵循 MIT License。
