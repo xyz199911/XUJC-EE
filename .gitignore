@@ -26,3 +26,11 @@ cmd.txt
 # Large PDFs (exceeds GitHub 100MB limit)
 信号与系统/考试内容（重点看）/
 信号与系统/教材/信号与系统.pdf
+
+# 本地隐私原稿（保留本地，不上传 GitHub）
+/人工智能/教材/
+/人工智能基础与应用/人工智能期末大作业_手写数字识别.pdf
+/个人理财/查重_简洁报告单_个人理财报告.pdf
+/multisim实践周/EIE240XX.zip
+/单片机实践周/EIE240XXxyzxyzxyz.zip
+/单片机实践周/lession2/lession1/MDK-ARM/*.uvguix.*

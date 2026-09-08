@@ -1,5 +1,5 @@
 % 初等函数画册作业
-% 姓名：夏学长  学号：EIE240XX
+% EIE0xx 24届电子夏学长
 
 %% 1. 左上角 p=1：二次函数 y = x^2，红色虚线 r--
 subplot(2,2,1)
@@ -38,5 +38,5 @@ title('y = sin(x)');
 grid on;
 xlabel('x');ylabel('y');
 
-% 总标题（姓名+学号）
-sgtitle('初等函数画册 - 夏学长 (EIE240XX)','FontSize',13);
+% 总标题
+sgtitle('初等函数画册 - EIE0xx 24届电子夏学长','FontSize',13);
