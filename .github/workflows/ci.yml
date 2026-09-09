@@ -32,3 +32,17 @@
             exit 1
           fi
           echo "No .bat files tracked - OK"
+
+  check-build-artifacts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify no Keil MDK build artifacts committed
+        run: |
+          if git ls-files | grep 'MDK-ARM/' | grep -qE '\.(o|crf|d|axf|map|lnp|uvoptx|uvguix|dep|lst|hex|htm)$'; then
+            echo "Error: Keil MDK build artifacts found in tracked files:"
+            git ls-files | grep 'MDK-ARM/' | grep -E '\.(o|crf|d|axf|map|lnp|uvoptx|uvguix|dep|lst|hex|htm)$'
+            exit 1
+          fi
+          echo "No Keil build artifacts tracked - OK"
