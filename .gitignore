@@ -32,8 +32,8 @@ cmd.txt
 /人工智能基础与应用/人工智能期末大作业_手写数字识别.pdf
 /大学英语1/课上presentation.pdf
 /个人理财/查重_简洁报告单_个人理财报告.pdf
-/multisim实践周/EIE240XX.zip
-/单片机实践周/EIE240XXxyzxyzxyz.zip
+/multisim实践周/*.zip
+/单片机实践周/*.zip
 
 # Keil MDK 编译产物（构建时自动生成，不提交；.uvprojx 工程文件与启动代码除外）
 **/MDK-ARM/*
