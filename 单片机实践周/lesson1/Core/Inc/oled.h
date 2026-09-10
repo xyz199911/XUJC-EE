@@ -11,6 +11,6 @@ HAL_StatusTypeDef OLED_Clear_Screen(void);
 HAL_StatusTypeDef OLED_Display_Char_8X16(uint8_t PageOffset, uint8_t ColumnOffset, uint8_t CharNum);
 HAL_StatusTypeDef OLED_Display_String_8X16(uint8_t PageOffset, uint8_t ColumnOffset, uint8_t* String);
 HAL_StatusTypeDef OLED_Display_Char_16X16(uint8_t PageOffset, uint8_t ColumnOffset, uint8_t CharNum);
-uint8_t OLED_Init(void);
+HAL_StatusTypeDef OLED_Init(void);
 
 #endif                    //½áÊøÌõ¼ş±àÒë

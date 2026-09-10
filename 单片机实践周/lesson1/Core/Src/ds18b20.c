@@ -2,7 +2,7 @@
 #include "tim.h"
 
 /**
-  * @brief DS18B20 输出模式
+  * @brief DS18B20 ���ģʽ
   */
 
 static void DS18B20_Mode_OUT_PP(void)
@@ -17,7 +17,7 @@ static void DS18B20_Mode_OUT_PP(void)
 }
  
 /**
-  * @brief DS18B20 输入模式
+  * @brief DS18B20 ����ģʽ
   */
 static void DS18B20_Mode_IN_NP(void)
 {
@@ -31,39 +31,39 @@ static void DS18B20_Mode_IN_NP(void)
 }
  
 /**
-  * @brief 主机给从机发送复位脉冲
+  * @brief �������ӻ����͸�λ����
   */
 static void DS18B20_Reset(void)
 {
-	DS18B20_Mode_OUT_PP();		// 主机输出
+	DS18B20_Mode_OUT_PP();		// �������
 	
-	DS18B20_OUT_0;						// 主机至少产生 480us 的低电平复位信号 
+	DS18B20_OUT_0;						// �������ٲ��� 480us �ĵ͵�ƽ��λ�ź� 
 	DELAY_Us(750);
-	DS18B20_OUT_1;						// 主机在产生复位信号后，需将总线拉高 
+	DS18B20_OUT_1;						// �����ڲ�����λ�źź��轫�������� 
 	
-	// 从机接收到主机的复位信号后，会在 15 ~ 60 us 后给主机发一个存在脉冲
+	// �ӻ����յ������ĸ�λ�źź󣬻��� 15 ~ 60 us ���������һ����������
 	DELAY_Us(15);					
 }
  
 /**
-  * @brief  检测从机给主机返回的存在脉冲
-  * @return 0：成功		1：失败
+  * @brief  ���ӻ����������صĴ�������
+  * @return 0���ɹ�		1��ʧ��
 	*/
 static uint8_t DS18B20_Presence(void)
 {
 	uint8_t pulse_time = 0;
 	
-	DS18B20_Mode_IN_NP();				// 主机设为输入 
+	DS18B20_Mode_IN_NP();				// ������Ϊ���� 
 	
-	// 等待存在脉冲的到来，存在脉冲为一个 60 ~ 240 us 的低电平信号 
-	// 如果存在脉冲没有来则做超时处理，从机接收到主机的复位信号后，会在 15 ~ 60 us 后给主机发一个存在脉冲
+	// �ȴ���������ĵ�������������Ϊһ�� 60 ~ 240 us �ĵ͵�ƽ�ź� 
+	// �����������û����������ʱ�������ӻ����յ������ĸ�λ�źź󣬻��� 15 ~ 60 us ���������һ����������
  
-	while (DS18B20_IN && (pulse_time < 100))		// 等待低电平响应脉冲
+	while (DS18B20_IN && (pulse_time < 100))		// �ȴ��͵�ƽ��Ӧ����
 	{
 		pulse_time++;
 		DELAY_Us(1);
 	}	
-	// 经过 100 us 后，存在脉冲都还没有到来
+	// ���� 100 us �󣬴������嶼��û�е���
 	if (pulse_time >= 100)
 	{
 		return 1;
@@ -73,7 +73,7 @@ static uint8_t DS18B20_Presence(void)
 		pulse_time = 0;		
 	}
 		
-	// 响应脉冲（低电平）到来，且存在的时间不能超过 240 us 
+	// ��Ӧ���壨�͵�ƽ���������Ҵ��ڵ�ʱ�䲻�ܳ��� 240 us 
 	while(!(DS18B20_IN) && pulse_time < 240)
 	{
 		pulse_time++;
@@ -90,8 +90,8 @@ static uint8_t DS18B20_Presence(void)
 }
  
  /**
-   * @brief  DS18B20 初始化函数
-   * @reurn  0：成功		1：失败
+   * @brief  DS18B20 ��ʼ������
+   * @reurn  0���ɹ�		1��ʧ��
    */
 uint8_t DS18B20_Init(void)
 {
@@ -103,21 +103,21 @@ uint8_t DS18B20_Init(void)
 }
  
 /**
-  * @brief 从DS18B20读取一个bit
+  * @brief ��DS18B20��ȡһ��bit
   */
 static uint8_t DS18B20_ReadBit(void)
 {
 	uint8_t dat;
 	
-	DS18B20_Mode_OUT_PP();	// 读 0 和读 1 的时间至少要大于 60 us 
+	DS18B20_Mode_OUT_PP();	// �� 0 �Ͷ� 1 ��ʱ������Ҫ���� 60 us 
 	
-	DS18B20_OUT_0;					// 读时间的起始：必须由主机产生 > 1us < 15us 的低电平信号 
+	DS18B20_OUT_0;					// ��ʱ�����ʼ���������������� > 1us < 15us �ĵ͵�ƽ�ź� 
 	
-	// 这个时间非常重要，设置为 < 15，需要多次尝试；如果设置不合理，数据会直接出错
-	// 参数建议设为 10 11 12，具体值要根据延时函数的执行效率测试
+	// ���ʱ��ǳ���Ҫ������Ϊ < 15����Ҫ��γ��ԣ�������ò����������ݻ�ֱ�ӳ���
+	// ����������Ϊ 10 11 12������ֵҪ������ʱ������ִ��Ч�ʲ���
 	DELAY_Us(10);		
 	
-	DS18B20_Mode_IN_NP();		// 设置成输入，释放总线，由外部上拉电阻将总线拉高 
+	DS18B20_Mode_IN_NP();		// ���ó����룬�ͷ����ߣ����ⲿ�������轫�������� 
 	
 	if (DS18B20_IN == 1)
 	{
@@ -128,13 +128,13 @@ static uint8_t DS18B20_ReadBit(void)
 		dat = 0;
 	}
 		
-	DELAY_Us(45);				// 这个延时参数参考时序图 
+	DELAY_Us(45);				// �����ʱ�����ο�ʱ��ͼ 
 	
 	return dat;
 }
  
 /**
-  * @brief 从 DS18B20 读一个字节，低位先行
+  * @brief �� DS18B20 ��һ���ֽڣ���λ����
   */
 static uint8_t DS18B20_ReadByte(void)
 {
@@ -143,14 +143,14 @@ static uint8_t DS18B20_ReadByte(void)
 	for(i = 0; i < 8; i++) 
 	{
 		j = DS18B20_ReadBit();		
-		dat = (dat) | (j << i);
+		dat |= (j << i);
 	}
 	
 	return dat;
 }
  
 /**
-  * @brief 写一个字节到 DS18B20，低位先行
+  * @brief дһ���ֽڵ� DS18B20����λ����
   */
 static void DS18B20_WriteByte(uint8_t dat)
 {
@@ -163,30 +163,30 @@ static void DS18B20_WriteByte(uint8_t dat)
  
 		dat = dat >> 1;		
 		
-		// 写 0 和写 1 的时间至少要大于60us 
+		// д 0 ��д 1 ��ʱ������Ҫ����60us 
 		
-		if (testb)			// 当前位写 1
+		if (testb)			// ��ǰλд 1
 		{			
 			DS18B20_OUT_0;
 			
-			DELAY_Us(5);		// 拉低发送写时段信号
+			DELAY_Us(5);		// ���ͷ���дʱ���ź�
 			
-			DS18B20_OUT_1;			// 读取电平时间保持高电平
+			DS18B20_OUT_1;			// ��ȡ��ƽʱ�䱣�ָߵ�ƽ
 			DELAY_Us(65);		
 		}		
-		else						// 当前位写 0			
+		else						// ��ǰλд 0			
 		{			
-			DS18B20_OUT_0;			// 拉低发送写时段信号
-			DELAY_Us(70);		// 读取电平时间保持低电平
+			DS18B20_OUT_0;			// ���ͷ���дʱ���ź�
+			DELAY_Us(70);		// ��ȡ��ƽʱ�䱣�ֵ͵�ƽ
 			
 			DS18B20_OUT_1;				
-			DELAY_Us(2);		// 恢复时间
+			DELAY_Us(2);		// �ָ�ʱ��
 		}
 	}
 }
  
 /**
-  * @brief  跳过匹配 DS18B20 ROM
+  * @brief  ����ƥ�� DS18B20 ROM
   */
 static void DS18B20_SkipRom(void)
 {
@@ -194,11 +194,11 @@ static void DS18B20_SkipRom(void)
 	
 	DS18B20_Presence();	 
 	
-	DS18B20_WriteByte(0XCC);		/* 跳过 ROM */
+	DS18B20_WriteByte(0XCC);		/* ���� ROM */
 }
  
 /**
-  * @brief  执行匹配 DS18B20 ROM
+  * @brief  ִ��ƥ�� DS18B20 ROM
   */
 static void DS18B20_MatchRom(void)
 {
@@ -206,28 +206,28 @@ static void DS18B20_MatchRom(void)
 	
 	DS18B20_Presence();	 
 	
-	DS18B20_WriteByte(0X55);		/* 匹配 ROM */
+	DS18B20_WriteByte(0X55);		/* ƥ�� ROM */
 }
  
 /**
-	* 存储的温度是16 位的带符号扩展的二进制补码形式
-	* 当工作在12位分辨率时，其中5个符号位，7个整数位，4个小数位
+	* �洢���¶���16 λ�Ĵ�������չ�Ķ����Ʋ�����ʽ
+	* ��������12λ�ֱ���ʱ������5������λ��7������λ��4��С��λ
 	*
-	*         |---------整数----------|-----小数 分辨率 1/(2^4)=0.0625----|
-	* 低字节  | 2^3 | 2^2 | 2^1 | 2^0 | 2^(-1) | 2^(-2) | 2^(-3) | 2^(-4) |
+	*         |---------����----------|-----С�� �ֱ��� 1/(2^4)=0.0625----|
+	* ���ֽ�  | 2^3 | 2^2 | 2^1 | 2^0 | 2^(-1) | 2^(-2) | 2^(-3) | 2^(-4) |
 	*
 	*
-	*         |-----符号位：0->正  1->负-------|-----------整数-----------|
-	* 高字节  |  s  |  s  |  s  |  s  |    s   |   2^6  |   2^5  |   2^4  |
+	*         |-----����λ��0->��  1->��-------|-----------����-----------|
+	* ���ֽ�  |  s  |  s  |  s  |  s  |    s   |   2^6  |   2^5  |   2^4  |
 	*
 	* 
-	* 温度 = 符号位 + 整数 + 小数*0.0625
+	* �¶� = ����λ + ���� + С��*0.0625
 	*/
  
 /**
-  * @brief  在跳过匹配 ROM 情况下获取 DS18B20 温度值 
-  * @param  无
-  * @retval 温度值
+  * @brief  ������ƥ�� ROM ����»�ȡ DS18B20 �¶�ֵ 
+  * @param  ��
+  * @retval �¶�ֵ
   */
 float DS18B20_GetTemp_SkipRom(void)
 {
@@ -236,10 +236,10 @@ float DS18B20_GetTemp_SkipRom(void)
 	float f_tem;
 	
 	DS18B20_SkipRom();
-	DS18B20_WriteByte(0X44);				/* 开始转换 */
-	HAL_Delay(750);                 	                               /*延迟750ms，过滤默认值85°，十分重要*/
+	DS18B20_WriteByte(0X44);				/* ��ʼת�� */
+	HAL_Delay(750);                 	                               /*�ӳ�750ms������Ĭ��ֵ85�㣬ʮ����Ҫ*/
 	DS18B20_SkipRom();
-  DS18B20_WriteByte(0XBE);				/* 读温度值 */
+  DS18B20_WriteByte(0XBE);				/* ���¶�ֵ */
 	
 	tplsb = DS18B20_ReadByte();		 
 	tpmsb = DS18B20_ReadByte(); 
@@ -247,27 +247,21 @@ float DS18B20_GetTemp_SkipRom(void)
 	s_tem = tpmsb << 8;
 	s_tem = s_tem | tplsb;
 	
-	if(s_tem < 0)			/* 负温度 */
-	{
-		f_tem = (~s_tem + 1) * 0.0625f;	
-	}
-	else
-	{
-		f_tem = s_tem * 0.0625f;
-	}
+	/* s_tem Ϊ�����Ŷ����Ʋ��룬����12λ�ֱ��� 0.0625�� ���ô������¶ȣ�������ͨ�� */
+	f_tem = (float)s_tem * 0.0625f;
 		
 	return f_tem; 	
 }
  
 /**
-  * @brief  在匹配 ROM 情况下获取 DS18B20 温度值 
-  * @param  ds18b20_id：用于存放 DS18B20 序列号的数组的首地址
+  * @brief  ��ƥ�� ROM ����»�ȡ DS18B20 �¶�ֵ 
+  * @param  ds18b20_id�����ڴ�� DS18B20 ���кŵ�������׵�ַ
   */
 void DS18B20_ReadId(uint8_t *ds18b20_id)
 {
 	uint8_t uc;
 	
-	DS18B20_WriteByte(0x33);       //读取序列号
+	DS18B20_WriteByte(0x33);       //��ȡ���к�
 	
 	for (uc = 0; uc < 8; uc++)
 	{
@@ -276,9 +270,9 @@ void DS18B20_ReadId(uint8_t *ds18b20_id)
 }
  
 /**
-  * @brief  在匹配 ROM 情况下获取 DS18B20 温度值 
-  * @param  ds18b20_id：存放 DS18B20 序列号的数组的首地址
-  * @retval 温度值
+  * @brief  ��ƥ�� ROM ����»�ȡ DS18B20 �¶�ֵ 
+  * @param  ds18b20_id����� DS18B20 ���кŵ�������׵�ַ
+  * @retval �¶�ֵ
   */
 float DS18B20_GetTemp_MatchRom(uint8_t * ds18b20_id)
 {
@@ -286,23 +280,23 @@ float DS18B20_GetTemp_MatchRom(uint8_t * ds18b20_id)
 	int16_t s_tem;
 	float f_tem;
 	
-	DS18B20_MatchRom();            	/* 匹配ROM */
+	DS18B20_MatchRom();            	/* ƥ��ROM */
 	
   for(i = 0;i < 8; i++)
 	{
 		DS18B20_WriteByte(ds18b20_id[i]);
 	}
 		
-	DS18B20_WriteByte(0X44);				/* 开始转换 */
-	HAL_Delay(750);                 /*延迟750ms，过滤初始值85°，十分重要*/ 
-	DS18B20_MatchRom();            	/* 匹配ROM */
+	DS18B20_WriteByte(0X44);				/* ��ʼת�� */
+	HAL_Delay(750);                 /*�ӳ�750ms�����˳�ʼֵ85�㣬ʮ����Ҫ*/ 
+	DS18B20_MatchRom();            	/* ƥ��ROM */
 	
 	for(i = 0; i < 8; i++)
 	{
 		DS18B20_WriteByte(ds18b20_id[i]);	
 	}
 		
-	DS18B20_WriteByte(0XBE);				/* 读温度值 */
+	DS18B20_WriteByte(0XBE);				/* ���¶�ֵ */
 	
 	tplsb = DS18B20_ReadByte();		 
 	tpmsb = DS18B20_ReadByte(); 
@@ -310,14 +304,8 @@ float DS18B20_GetTemp_MatchRom(uint8_t * ds18b20_id)
 	s_tem = tpmsb << 8;
 	s_tem = s_tem | tplsb;
 	
-	if (s_tem < 0)									/* 负温度 */
-	{
-		f_tem = (~s_tem + 1) * 0.0625f;	
-	}
-	else
-	{
-		f_tem = s_tem * 0.0625f;
-	}
+	/* s_tem Ϊ�����Ŷ����Ʋ��룬����12λ�ֱ��� 0.0625�� ���ô������¶ȣ�������ͨ�� */
+	f_tem = (float)s_tem * 0.0625f;
 		
 	return f_tem; 		
 }

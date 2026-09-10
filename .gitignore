@@ -39,3 +39,7 @@ cmd.txt
 **/MDK-ARM/*
 !**/MDK-ARM/*.uvprojx
 !**/MDK-ARM/startup_*.s
+# 本地源码备份/重构留档（仅本地保留，不提交）
+*.bak
+*.orig
+/单片机实践周/_backup/
