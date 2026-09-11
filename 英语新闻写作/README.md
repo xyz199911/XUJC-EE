@@ -6,7 +6,7 @@
 
 | 文件 | 说明 |
 |------|------|
-| IST Secures Historic Three-Peat Victory at TKK College Athletics Meet.docx | 最后作业是写新闻报道写作作业（体育新闻专题） |
+| IST Secures Historic Three-Peat Victory at TKK College Athletics Meet.docx | 最后作业是写新闻报道写作作业我写的是（体育新闻专题） |
 | presentation（AI+Nomads+2026-卫星城市崛起）.pptx | 课堂展示课件 |
 
  ## 📌 重点看这里
