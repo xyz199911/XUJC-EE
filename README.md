@@ -144,14 +144,3 @@ git clone https://github.com/xyz199911/XUJC-EE.git
 ## 许可
 
 MIT License
-
----
-
-## 🧋 支持一下
-
-如果这些资料帮你省了时间，欢迎请学长喝杯奶茶～
-
-<p align="center">
-  <img src="./打赏/微信收款码.jpg" width="260" alt="微信收款码"/>
-  <img src="./打赏/支付宝收款码.jpg" width="260" alt="支付宝收款码"/>
-</p>
