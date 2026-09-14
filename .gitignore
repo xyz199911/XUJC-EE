@@ -44,3 +44,9 @@ cmd.txt
 *.bak
 *.orig
 /单片机实践周/_backup/
+
+# 打赏收款码已迁移至 docs/reward（根目录打赏文件夹不再上传）
+/打赏/
+
+# 预览工具缓存
+.preview/

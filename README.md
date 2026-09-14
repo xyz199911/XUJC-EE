@@ -144,3 +144,12 @@ git clone https://github.com/xyz199911/XUJC-EE.git
 ## 许可
 
 MIT License
+
+
+## 打赏支持
+
+如果这些资料对你有帮助，欢迎打赏支持～
+
+![微信收款码](docs/reward/微信收款码.jpg)
+
+![支付宝收款码](docs/reward/支付宝收款码.jpg)
